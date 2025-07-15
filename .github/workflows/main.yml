@@ -6,8 +6,6 @@ on:
   pull_request:
     branches: [ develop ]
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 1 * *"
 
 jobs:
   build-linux-32bit:
@@ -24,12 +22,14 @@ jobs:
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y \
-            gcc-5-multilib g++-5-multilib \
+            gcc-multilib g++-multilib \
             libgl1-mesa-dev:i386 \
             qttools5-dev:i386 \
             libstdc++6:i386 \
             libgcc1:i386 \
-            zlib1g:i386
+            zlib1g:i386 \
+            libx11-6:i386 \
+            libxext6:i386
 
       - name: Build
         run: |
@@ -37,8 +37,8 @@ jobs:
           mkdir build
           cd build
           cmake \
-           -DCMAKE_C_COMPILER=/usr/bin/gcc-5 \
-           -DCMAKE_CXX_COMPILER=/usr/bin/g++-5 \
+           -DCMAKE_C_COMPILER=/usr/bin/gcc \
+           -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
            -DCMAKE_BUILD_TYPE=Release \
            -DLauncher_NOTIFICATION_URL:STRING=https://files.multimc.org/notifications.json \
            -DCMAKE_INSTALL_PREFIX:PATH=/home/runner/UltimMC/UltimMC \
@@ -51,6 +51,7 @@ jobs:
            -DLauncher_EMBED_SECRETS=On \
            -DCMAKE_C_FLAGS="-m32" \
            -DCMAKE_CXX_FLAGS="-m32" \
+           -DCMAKE_EXE_LINKER_FLAGS="-m32" \
            $GITHUB_WORKSPACE
 
       - name: Compile
